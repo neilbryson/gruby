@@ -1,0 +1,33 @@
+{
+    "apri" : {
+        "dap" : "ETD-APRI_DAP_"
+    },
+    "tli" : {
+        "dap" : "PAGBILAO DAP Schedule for %s"
+    },
+    "cppc" : {
+        "dap" : "CPPC DAP Schedule for %s"
+    },
+    "tmi" : {
+
+    },
+    "tsi" : {
+
+    },
+    "tmo" : {
+
+    },
+    "eauc" : {
+
+    },
+    "hedcor" : {
+
+    },
+    "common" : {
+        "shiftReport" : {
+            "first" : "1st Shift Report %s",
+            "second" : "2nd Shift Report %s",
+            "third" : "3rd Shit Operation Report for %s - %s"
+        }
+    }
+}
