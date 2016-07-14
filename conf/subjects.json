@@ -27,7 +27,7 @@
         "shiftReport" : {
             "first" : "1st Shift Report %s",
             "second" : "2nd Shift Report %s",
-            "third" : "3rd Shit Operation Report for %s - %s"
+            "third" : "3rd Shift Operation Report for %s - %s"
         }
     }
 }
