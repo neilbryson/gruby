@@ -2,39 +2,51 @@
 require 'json'
 require 'google/apis/gmail_v1'
 
-class GoogleAuth
+module NeilBryson
+  class GoogleAuth
 
     ##
-    # The default location of the credentials file
-    #
-    # /path/to/project/conf/credentials.json
-    #
-    # Of course, this can be overwritten on the initialize method
-    @@defaultCredentialsFilePath = File.join(File.dirname(__FILE__), 
-        '../conf/credentials.json')
+    # The GoogleAuth API
+    ##
+    gAuth = Google::Auth
+    @@gAuthDefaultCreds = gAuth::DefaultCredentials
 
-    @gmail = Google::Apis::GmailV1
-
-    def initialize(credentialsJsonPath = @@defaultCredentialsFilePath)
-        @credentialsJsonPath = credentialsJsonPath
+    ##
+    # @param string scope The Auth Scopes / permissions
+    # @param string credentialsJsonPath The path to the JSON credentials file
+    # @param class service The Google API service
+    ##
+    def initialize(scope, credentialsJsonPath, service)
+      @credentialsJsonPath = credentialsJsonPath
+      @scope = scope
+      @service = service
     end
 
-    # Retrieve the Gmail username and the Google app password.
+    ##
+    # Load the Google-generated credentials file.
     #
-    # @return array json
-    def parseCredentialsFile
-        file = File.read(@credentialsJsonPath)
-        json = JSON.parse(file)
-        if ! json['email'] || ! json['app_password']
-            raise "Credentials file must have email and app_password"
-        end
-        json
+    # @return IO io
+    ##
+    def loadCredentialsFile
+      fd = IO.sysopen(@credentialsJsonPath, 'r')
+      io = IO.new(fd, 'r')
+      io
     end
 
-    def authenticate
-        @credentials = self.parseCredentialsFile
-        tokenStore = Google::Apis::GmailV1.new
-        puts tokenStore
+    ##
+    # Retrieve the access token
+    #
+    # @return array The access token
+    ##
+    def authorise
+      @jsonKeyIo = self.loadCredentialsFile
+      gAuthDefaultCreds = @@gAuthDefaultCreds
+      serviceAccountCredentials = gAuthDefaultCreds.make_creds(
+        {:json_key_io => @jsonKeyIo, :scope => @scope})
+      @service.authorization = serviceAccountCredentials
+      @service.authorization.fetch_access_token
     end
+
+  end
 
 end
