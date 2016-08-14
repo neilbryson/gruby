@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+require 'google/apis/drive_v2'
 require_relative 'googleAuth.rb'
 
 module NeilBryson

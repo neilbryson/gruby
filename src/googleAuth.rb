@@ -1,6 +1,4 @@
 #!/usr/bin/env ruby
-require 'google/apis/gmail_v1'
-require 'google/apis/drive_v2'
 
 module NeilBryson
   class GoogleAuth

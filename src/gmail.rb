@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+require 'google/apis/gmail_v1'
 require_relative 'googleAuth.rb'
 
 module NeilBryson
