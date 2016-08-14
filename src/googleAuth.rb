@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
-require 'json'
 require 'google/apis/gmail_v1'
+require 'google/apis/drive_v2'
 
 module NeilBryson
   class GoogleAuth
@@ -9,23 +9,26 @@ module NeilBryson
     # The GoogleAuth API
     ##
     gAuth = Google::Auth
+    @@gAuthJwtService = gAuth::ServiceAccountJwtHeaderCredentials
     @@gAuthDefaultCreds = gAuth::DefaultCredentials
 
     ##
-    # @param string scope The Auth Scopes / permissions
-    # @param string credentialsJsonPath The path to the JSON credentials file
-    # @param class service The Google API service
+    # @param [string] scope The Auth Scopes / permissions
+    # @param [string] credentialsJsonPath The path to the JSON credentials file
+    # @param [class] service The Google API service
+    # @param [nil|string] sub The account for impersonation. Will only work for
+    #   Google Domain accounts. Required for Gmail.
     ##
-    def initialize(scope, credentialsJsonPath, service)
+    def initialize(scope, credentialsJsonPath, service, sub = nil)
       @credentialsJsonPath = credentialsJsonPath
       @scope = scope
       @service = service
+      @sub = sub
     end
 
     ##
     # Load the Google-generated credentials file.
-    #
-    # @return IO io
+    # @return [IO] io
     ##
     def loadCredentialsFile
       fd = IO.sysopen(@credentialsJsonPath, 'r')
@@ -35,16 +38,19 @@ module NeilBryson
 
     ##
     # Retrieve the access token
-    #
-    # @return array The access token
+    # @return [array] The access token
     ##
     def authorise
       @jsonKeyIo = self.loadCredentialsFile
       gAuthDefaultCreds = @@gAuthDefaultCreds
       serviceAccountCredentials = gAuthDefaultCreds.make_creds(
-        {:json_key_io => @jsonKeyIo, :scope => @scope})
+        {json_key_io:  @jsonKeyIo, scope: @scope})
       @service.authorization = serviceAccountCredentials
-      @service.authorization.fetch_access_token
+      if ! @sub.nil?
+        # Assign account for impersonation
+        @service.authorization.sub = @sub
+      end
+      @service.authorization.fetch_access_token!
     end
 
   end
